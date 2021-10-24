@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Cart</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{../cart.css}"/>
+</head>
+<body>
+<div id="headline">Cart</div>
+
+<div class="modal-body">
+    <div class="cart-row">
+        <span class="cart-item cart-header cart-column">Product</span>
+        <span class="cart-price cart-header cart-column">Price</span>
+        <span class="cart-quantity cart-header cart-column">Quantity</span>
+    </div>
+
+    <div th:if="${session.CART!=null or !session.CART.empty}">
+        <div th:with="total=0" class="cart-items">
+
+            <div th:each="cart: ${session.CART}"
+                 class="cart-row">
+                <p th:with="total=${total + cart.value.tblProducts.price*cart.value.quantity}" th:text="${total}"/>
+                <div class="cart-item cart-column">
+                    <img class="cart-item-image" th:src="@{image/{url}(url=${cart.value.tblProducts.image})}"
+                         width="100"
+                         height="100">
+                    <span class="cart-item-title" th:text="${cart.value.tblProducts.productName}"/>
+                </div>
+                <span class="cart-price cart-column" th:text="${cart.value.tblProducts.price}+' vnd'"></span>
+                <div class="cart-quantity cart-column">
+                    <form th:action="@{/removecart}" method="GET">
+                        <input class="cart-quantity-input" type="number" th:value="${cart.value.quantity}"
+                               disabled="true">
+                        <input type="hidden" th:value="${cart.key}" name="id"/>
+                        <button class="btn btn-danger" type="submit">Xóa</button>
+                    </form>
+                </div>
+
+            </div>
+
+
+            <div class="cart-total">
+                <strong class="cart-total-title">Total money:</strong>
+                <span class="cart-total-price"
+                      th:text="${#aggregates.sum(session.CART.values.![tblProducts.price*quantity])}"></span>
+            </div>
+
+        </div>
+    </div>
+    <h4 th:if="${session.CART==null or session.CART.empty}">
+        No cart yet.
+    </h4>
+
+
+</div>
+</div>
+<button class="button" onclick="window.location.href = '/store  '">Continue shopping</button>
+<button class="button" onclick="window.location.href = 'Controller?url=CHECKOUT'">Check out</button>
+<br>
+</body>
+
+</html>
